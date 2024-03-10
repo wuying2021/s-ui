@@ -453,7 +453,7 @@ disable_bbr() {
     sed -i 's/net.ipv4.tcp_congestion_control=bbr/net.ipv4.tcp_congestion_control=cubic/' /etc/sysctl.conf
 
     # Apply changes
-    sysctl -p
+    sudo sysctl -p
 
     # Verify that BBR is replaced with CUBIC
     if [[ $(sysctl net.ipv4.tcp_congestion_control | awk '{print $3}') == "cubic" ]]; then
@@ -491,7 +491,7 @@ enable_bbr() {
     echo "net.ipv4.tcp_congestion_control=bbr" | tee -a /etc/sysctl.conf
 
     # Apply changes
-    sysctl -p
+    sudo sysctl -p
 
     # Verify that BBR is enabled
     if [[ $(sysctl net.ipv4.tcp_congestion_control | awk '{print $3}') == "bbr" ]]; then
