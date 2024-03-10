@@ -608,7 +608,7 @@ ssl_cert_issue() {
         LOGE "issue certs succeed,installing certs..."
     fi
     # install cert
-    ~/.acme.sh/acme.sh --installcert -d ${domain} \
+    ~/.acme.sh/acme.sh --installcert -d --force ${domain} \
         --key-file /root/cert/${domain}/privkey.pem \
         --fullchain-file /root/cert/${domain}/fullchain.pem
 
