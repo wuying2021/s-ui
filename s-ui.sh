@@ -678,23 +678,23 @@ ssl_cert_issue_CF() {
         fi
         export CF_Key="${CF_GlobalKey}"
         export CF_Email=${CF_AccountEmail}
-        ~/.acme.sh/acme.sh --issue --dns dns_cf -d ${CF_Domain} -d *.${CF_Domain} --log
+        ~/.acme.sh/acme.sh --issue --dns dns_cf -d ${CF_Domain} -d *.${CF_Domain} --log --force
         if [ $? -ne 0 ]; then
             LOGE "Certificate issuance failed, script exiting..."
             exit 1
         else
             LOGI "Certificate issued Successfully, Installing..."
         fi
-        ~/.acme.sh/acme.sh --installcert -d --force ${CF_Domain} -d *.${CF_Domain} --ca-file /root/cert/ca.cer \
+        ~/.acme.sh/acme.sh --installcert -d ${CF_Domain} -d *.${CF_Domain} --ca-file /root/cert/ca.cer \
         --cert-file /root/cert/${CF_Domain}.cer --key-file /root/cert/${CF_Domain}.key \
-        --fullchain-file /root/cert/fullchain.cer
+        --fullchain-file /root/cert/fullchain.cer --force
         if [ $? -ne 0 ]; then
             LOGE "Certificate installation failed, script exiting..."
             exit 1
         else
             LOGI "Certificate installed Successfully,Turning on automatic updates..."
         fi
-        ~/.acme.sh/acme.sh --upgrade --auto-upgrade
+        ~/.acme.sh/acme.sh --upgrade --auto-upgrade --force
         if [ $? -ne 0 ]; then
             LOGE "Auto update setup Failed, script exiting..."
             ls -lah cert
