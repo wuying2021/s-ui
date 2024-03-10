@@ -36,7 +36,7 @@
 ## Install & Upgrade to Latest Version
 
 ```sh
-bash <(curl -Ls https://raw.githubusercontent.com/alireza0/s-ui/master/install.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/wuying2021/s-ui/master/install.sh)
 ```
 
 ## Install Custom Version
@@ -44,7 +44,7 @@ bash <(curl -Ls https://raw.githubusercontent.com/alireza0/s-ui/master/install.s
 **Step 1:** To install your desired version, add the version to the end of the installation command. e.g., ver `0.0.1`:
 
 ```sh
-bash <(curl -Ls https://raw.githubusercontent.com/alireza0/s-ui/master/install.sh) 0.0.1
+bash <(curl -Ls https://raw.githubusercontent.com/wuying2021/s-ui/master/install.sh) 0.0.1
 ```
 
 ## Uninstall S-UI
