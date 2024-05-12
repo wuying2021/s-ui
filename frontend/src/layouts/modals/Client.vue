@@ -26,6 +26,9 @@
                 <v-col cols="12" sm="6" md="4">
                   <v-text-field v-model="client.name" :label="$t('client.name')" hide-details></v-text-field>
                 </v-col>
+                <v-col cols="12" sm="6" md="4">
+                  <v-text-field v-model="client.desc" :label="$t('client.desc')" hide-details></v-text-field>
+                </v-col>
               </v-row>
               <v-row>
                 <v-col cols="12" sm="6" md="4">
@@ -139,6 +142,7 @@
         <v-btn
           color="blue-darken-1"
           variant="tonal"
+          :loading="loading"
           @click="saveChanges"
         >
           {{ $t('actions.save') }}
@@ -160,6 +164,7 @@ export default {
     return {
       client: createClient(),
       title: "add",
+      loading: false,
       clientStats: false,
       tab: "t1",
       clientConfig: <any>[],
@@ -193,12 +198,14 @@ export default {
       this.$emit('close')
     },
     saveChanges() {
+      this.loading = true
       this.client.config = updateConfigs(JSON.stringify(this.clientConfig), this.client.name)
       this.client.links = JSON.stringify([
                             ...this.links,
                             ...this.extLinks.filter(l => l.uri != ''),
                             ...this.subLinks.filter(l => l.uri != '')])
       this.$emit('save', this.client, this.clientStats)
+      this.loading = false
     },
     setDate(newDate:number){
       this.client.expiry = newDate
@@ -206,7 +213,7 @@ export default {
   },
   computed: {
     clientInbounds: {
-      get() { return this.client.inbounds == "" ? [] : this.client.inbounds.split(',') },
+      get() { return this.client.inbounds == "" ? [] : this.client.inbounds.split(',').filter(i => this.inboundTags.includes(i)) },
       set(newValue:string[]) { this.client.inbounds = newValue.length == 0 ?  "" : newValue.join(',') }
     },
     expDate: {
@@ -219,8 +226,9 @@ export default {
     }
   },
   watch: {
-      visible(newValue) { if (newValue) {
-          this.updateData()
+    visible(newValue) {
+      if (newValue) {
+        this.updateData()
       }
     },
   },
