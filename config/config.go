@@ -22,6 +22,9 @@ const (
 	Info  LogLevel = "info"
 	Warn  LogLevel = "warn"
 	Error LogLevel = "error"
+
+	ModeMaster = "master"
+	ModeClient = "client"
 )
 
 func GetVersion() string {
@@ -65,4 +68,36 @@ func GetDBFolderPath() string {
 
 func GetDBPath() string {
 	return fmt.Sprintf("%s/%s.db", GetDBFolderPath(), GetName())
+}
+
+func GetClusterMode() string {
+	mode := os.Getenv("SUI_MODE")
+	if mode == "" {
+		return ModeMaster
+	}
+	return mode
+}
+
+func GetClusterToken() string {
+	return os.Getenv("SUI_CLUSTER_TOKEN")
+}
+
+func GetMasterEndpoint() string {
+	return os.Getenv("SUI_MASTER_ENDPOINT")
+}
+
+func GetNodeID() string {
+	if id := os.Getenv("SUI_NODE_ID"); id != "" {
+		return id
+	}
+
+	host, err := os.Hostname()
+	if err != nil {
+		return ""
+	}
+	return host
+}
+
+func GetNodeAddress() string {
+	return os.Getenv("SUI_NODE_ADDRESS")
 }
