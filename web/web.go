@@ -34,13 +34,15 @@ type Server struct {
 	ctx            context.Context
 	cancel         context.CancelFunc
 	settingService service.SettingService
+	clusterService *service.ClusterService
 }
 
-func NewServer() *Server {
+func NewServer(clusterService *service.ClusterService) *Server {
 	ctx, cancel := context.WithCancel(context.Background())
 	return &Server{
-		ctx:    ctx,
-		cancel: cancel,
+		ctx:            ctx,
+		cancel:         cancel,
+		clusterService: clusterService,
 	}
 }
 
@@ -108,6 +110,7 @@ func (s *Server) initRouter() (*gin.Engine, error) {
 
 	group_api := engine.Group(base_url + "api")
 	api.NewAPIHandler(group_api, apiv2)
+	api.NewClusterAPI(group_api.Group("/cluster"), s.clusterService)
 
 	// Serve index.html as the entry point
 	// Handle all other routes by serving index.html

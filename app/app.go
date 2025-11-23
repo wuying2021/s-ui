@@ -3,6 +3,7 @@ package app
 import (
 	"log"
 
+	"github.com/alireza0/s-ui/cluster"
 	"github.com/alireza0/s-ui/config"
 	"github.com/alireza0/s-ui/core"
 	"github.com/alireza0/s-ui/cronjob"
@@ -23,6 +24,9 @@ type APP struct {
 	cronJob       *cronjob.CronJob
 	logger        *logging.Logger
 	core          *core.Core
+	cluster       *cluster.Manager
+	clusterSvc    *service.ClusterService
+	agent         *cluster.Agent
 }
 
 func NewApp() *APP {
@@ -44,8 +48,13 @@ func (a *APP) Init() error {
 
 	a.core = core.NewCore()
 
+	if config.GetClusterMode() == config.ModeMaster {
+		a.cluster = cluster.NewManager(config.GetClusterToken())
+		a.clusterSvc = service.NewClusterService(a.cluster)
+	}
+
 	a.cronJob = cronjob.NewCronJob()
-	a.webServer = web.NewServer()
+	a.webServer = web.NewServer(a.clusterSvc)
 	a.subServer = sub.NewServer()
 
 	a.configService = service.NewConfigService(a.core)
@@ -54,6 +63,10 @@ func (a *APP) Init() error {
 }
 
 func (a *APP) Start() error {
+	if config.GetClusterMode() == config.ModeClient {
+		return a.startClientMode()
+	}
+
 	loc, err := a.SettingService.GetTimeLocation()
 	if err != nil {
 		return err
@@ -88,6 +101,12 @@ func (a *APP) Start() error {
 }
 
 func (a *APP) Stop() {
+	if config.GetClusterMode() == config.ModeClient {
+		if a.agent != nil {
+			a.agent.Stop()
+		}
+		return
+	}
 	a.cronJob.Stop()
 	err := a.subServer.Stop()
 	if err != nil {
@@ -121,6 +140,13 @@ func (a *APP) initLog() {
 func (a *APP) RestartApp() {
 	a.Stop()
 	a.Start()
+}
+
+func (a *APP) startClientMode() error {
+	endpoint := config.GetMasterEndpoint()
+	agent := cluster.NewAgent(config.GetNodeID(), config.GetNodeAddress(), endpoint, config.GetClusterToken())
+	a.agent = agent
+	return agent.Start()
 }
 
 func (a *APP) GetCore() *core.Core {
